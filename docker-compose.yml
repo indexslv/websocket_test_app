@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  client:
+    build: ./client
+    ports:
+      - '3000:3000'
+
+  server:
+    build: ./server
+    ports:
+      - '4000:4000'
+    depends_on:
+      - mariadb
+    environment:
+      - DB_HOST=mariadb
+      - DB_USER=root
+      - DB_PASSWORD=your_password
+      - DB_DATABASE=docker_management
+
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: your_password
+      MYSQL_DATABASE: docker_management
+    ports:
+      - '3306:3306'
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./mariadb/sql:/docker-entrypoint-initdb.d
+
+volumes:
+  mariadb_data:
