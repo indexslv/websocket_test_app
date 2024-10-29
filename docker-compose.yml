@@ -14,7 +14,7 @@ services:
     depends_on:
       - mariadb
     environment:
-      - DB_HOST=mariadb
+      - DB_HOST=10.10.20.120
       - DB_USER=root
       - DB_PASSWORD=your_password
       - DB_DATABASE=docker_management
