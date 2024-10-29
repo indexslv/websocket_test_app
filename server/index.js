@@ -23,31 +23,29 @@ const server = https.createServer({
 const io = new Server(server, { secure: true });
 
 io.on('connection', (socket) => {
-    socket.on('startContainer', async ({ ip, port, password }) => {
-      console.log('Received startContainer event with:', { ip, port, password }); // Log incoming data
-      
-      try {
-        const container = await docker.createContainer({
-          Image: 'node:latest',
-          Cmd: ['node', '-e', `console.log('IP: ${ip}, Port: ${port}, Password: ${password}')`],
-          ExposedPorts: { [`${port}/tcp`]: {} },
-        });
-  
-        await container.start();
-  
-        const containerData = { id: container.id, ip, port, password, status: 'running' };
-        await saveContainerData(containerData);
-  
-        // Emit back to the frontend
-        io.emit('updateContainers', containerData);
-      } catch (error) {
-        console.error('Error creating container:', error);
-      }
-    });
-  
-    // Other events...
+  console.log('Client connected'); // Log when a client connects
+
+  socket.on('startContainer', async ({ ip, port, password }) => {
+    console.log('Received startContainer event with:', { ip, port, password }); // Log event details
+    
+    try {
+      const container = await docker.createContainer({
+        Image: 'node:latest',
+        Cmd: ['node', '-e', `console.log('IP: ${ip}, Port: ${port}, Password: ${password}')`],
+        ExposedPorts: { [`${port}/tcp`]: {} },
+      });
+
+      await container.start();
+
+      const containerData = { id: container.id, ip, port, password, status: 'running' };
+      await saveContainerData(containerData);
+
+      io.emit('updateContainers', containerData); // Emit update to frontend
+    } catch (error) {
+      console.error('Error creating container:', error);
+    }
   });
-  
+});
 
 async function saveContainerData(container) {
   const conn = await pool.getConnection();
