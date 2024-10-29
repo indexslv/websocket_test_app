@@ -11,6 +11,7 @@ const pool = mariadb.createPool({
   user: 'root',
   password: 'your_password',
   database: 'docker_management',
+  port: 3307
 });
 
 const app = express();
